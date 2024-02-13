@@ -1,30 +1,74 @@
+import 'package:app_movies/models/exports_models.dart';
 import 'package:flutter/material.dart';
 
-class MovieSliderHScreen extends StatelessWidget {
+class MovieSliderHScreen extends StatefulWidget {
 
-  const MovieSliderHScreen({Key? key}) : super(key: key);
+  final List<Movie> movies;
+  final String? title;
+  final Function onNextPage;
+
+  const MovieSliderHScreen(
+    {
+      super.key,
+      required this.movies,
+      required this.onNextPage,
+      this.title,
+    });
+
+  @override
+  State<MovieSliderHScreen> createState() => _MovieSliderHScreenState();
+}
+
+class _MovieSliderHScreenState extends State<MovieSliderHScreen> {
+
+  final ScrollController scrollController = ScrollController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    scrollController.addListener(() {
+
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 350) {
+        widget.onNextPage();
+      }
+      // print(scrollController.position.pixels);
+      // print(scrollController.position.maxScrollExtent);
+
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
     width: double.infinity, //PARA QUE OCUPE EL ANCHO DEL SCREEN
-    height: 250,
+    height: 280,
     // color: Colors.teal,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Text('Popular movies', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold))
+
+        if(widget.title != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text( widget.title!, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
           ),
 
-        const SizedBox(height: 3,),
+        const SizedBox(height: 5,),
 
         Expanded(
           child: ListView.builder(
+            controller: scrollController,
             scrollDirection: Axis.horizontal,
-            itemCount: 20,
-            itemBuilder: (_, int index) => _MovieSlider(),
+            itemCount: widget.movies.length,
+            itemBuilder: (_, int index) => _MovieSlider(widget.movies[index]),
             ),
           ),
         ],
@@ -35,7 +79,9 @@ class MovieSliderHScreen extends StatelessWidget {
 
 class _MovieSlider extends StatelessWidget { //CUANDO ES PRIVADO SE PONE UN GUIÃ“N BAJO (_)
 
-  const _MovieSlider({Key? key}) : super(key: key);
+  final Movie movie;
+
+  const _MovieSlider(this.movie);
 
   @override
   Widget build(BuildContext context) {
@@ -43,17 +89,17 @@ class _MovieSlider extends StatelessWidget { //CUANDO ES PRIVADO SE PONE UN GUIÃ
       width: 130,
       height: 190,
       // color: Colors.tealAccent,
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Column(
         children: [
 
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, 'details', arguments: 'movie-instance'),
+            onTap: () => Navigator.pushNamed(context, 'details', arguments: movie),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: const FadeInImage(
-                placeholder: AssetImage('assets/no-image.jpg'),
-                image: NetworkImage('https://via.placeholder.com//300x400'),
+              child: FadeInImage(
+                placeholder: const AssetImage('assets/no-image.jpg'),
+                image: NetworkImage(movie.fullPosterImg),
                 width: 130,
                 height: 170,
                 fit: BoxFit.cover,
@@ -63,8 +109,8 @@ class _MovieSlider extends StatelessWidget { //CUANDO ES PRIVADO SE PONE UN GUIÃ
 
           const SizedBox(height: 5,),
 
-            const Text(
-              'One Piece',
+          Text(
+              movie.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
