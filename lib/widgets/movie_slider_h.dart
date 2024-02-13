@@ -1,5 +1,6 @@
-import 'package:app_movies/models/exports_models.dart';
 import 'package:flutter/material.dart';
+
+import 'package:app_movies/models/exports_models.dart';
 
 class MovieSliderHScreen extends StatefulWidget {
 
