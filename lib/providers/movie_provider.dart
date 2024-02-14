@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
+import 'package:app_movies/models/search_response.dart';
 import 'package:app_movies/models/exports_models.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,7 +10,7 @@ class MovieProvider extends ChangeNotifier{
 
   final String _apiKey   = '4269879e057d063eb39e7809a39f4fbc';
   final String _baseUrl  = 'api.themoviedb.org';
-  final String _language = 'es-ES';
+  final String _language = 'es-MX';
 
   List<Movie> onDisplayMovies = [];
   List<Movie> popularMovies = [];
@@ -27,7 +28,7 @@ class MovieProvider extends ChangeNotifier{
   }
 
   Future<String>_getJsonData(String endpoint, [int page=1]) async{
-    var url = Uri.https(_baseUrl, endpoint, {
+    final url = Uri.https(_baseUrl, endpoint, {
       'api_key': _apiKey,
       'language': _language,
       'page': '$page',
@@ -62,7 +63,7 @@ class MovieProvider extends ChangeNotifier{
   }
 
   Future<List<Cast>> getMovieCast( int movieId) async{
- 
+
     if(moviesCast.containsKey(movieId)) return moviesCast[movieId]!;
 
     // print('Pidiendo información al servidor - CAST');
@@ -72,5 +73,18 @@ class MovieProvider extends ChangeNotifier{
     moviesCast[movieId] = creditsResponse.cast;
 
     return creditsResponse.cast;
+  }
+
+  Future<List<Movie>>searchMovies(String query) async {
+    final url = Uri.https(_baseUrl, '3/search/movie', {
+    'api_key': _apiKey,
+    'language': _language,
+    'query': query,
+    });
+
+    final response = await http.get(url);
+    final searchResponse = SearchResponse.fromJson(response.body);
+
+    return searchResponse.results;
   }
 }
