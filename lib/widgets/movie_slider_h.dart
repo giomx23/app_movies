@@ -69,7 +69,7 @@ class _MovieSliderHScreenState extends State<MovieSliderHScreen> {
             controller: scrollController,
             scrollDirection: Axis.horizontal,
             itemCount: widget.movies.length,
-            itemBuilder: (_, int index) => _MovieSlider(widget.movies[index]),
+            itemBuilder: (_, int index) => _MovieSlider(widget.movies[index], '${widget.title}-$index-${widget.movies[index].id}'),
             ),
           ),
         ],
@@ -81,11 +81,15 @@ class _MovieSliderHScreenState extends State<MovieSliderHScreen> {
 class _MovieSlider extends StatelessWidget { //CUANDO ES PRIVADO SE PONE UN GUIÃ“N BAJO (_)
 
   final Movie movie;
+  final String heroID;
 
-  const _MovieSlider(this.movie);
+  const _MovieSlider(this.movie, this.heroID);
 
   @override
   Widget build(BuildContext context) {
+
+    movie.heroID = heroID;
+
     return Container(
       width: 130,
       height: 190,
@@ -96,15 +100,18 @@ class _MovieSlider extends StatelessWidget { //CUANDO ES PRIVADO SE PONE UN GUIÃ
 
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, 'details', arguments: movie),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: FadeInImage(
-                placeholder: const AssetImage('assets/no-image.jpg'),
-                image: NetworkImage(movie.fullPosterImg),
-                width: 130,
-                height: 170,
-                fit: BoxFit.cover,
-                ),
+            child: Hero(
+              tag: movie.heroID!,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: FadeInImage(
+                  placeholder: const AssetImage('assets/no-image.jpg'),
+                  image: NetworkImage(movie.fullPosterImg),
+                  width: 130,
+                  height: 170,
+                  fit: BoxFit.cover,
+                  ),
+              ),
             ),
           ),
 
